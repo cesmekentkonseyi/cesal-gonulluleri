@@ -34,8 +34,15 @@
     </nav>
 
     <div class="container mt-4">
-        <h1 class="mb-4">Can Dostları</h1>
-        
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="mb-4">Can Dostları</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#canDostuEkleModal">
+                    <i class="fas fa-plus"></i> Can Dostu Ekle
+                </button>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
@@ -47,10 +54,10 @@
                                 <th>Cins</th>
                                 <th>Yaş</th>
                                 <th>Durum</th>
+                                <th>İşlemler</th>
                             </tr>
                         </thead>
                         <tbody id="canDostlariListesi">
-                            <!-- JavaScript ile veriler buraya eklenecek -->
                         </tbody>
                     </table>
                 </div>
@@ -58,39 +65,259 @@
         </div>
     </div>
 
+    <!-- Can Dostu Ekle Modal -->
+    <div class="modal fade" id="canDostuEkleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Can Dostu Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="canDostuEkleForm">
+                        <div class="mb-3">
+                            <label for="ad" class="form-label">Ad</label>
+                            <input type="text" class="form-control" id="ad" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cins" class="form-label">Cins</label>
+                            <select class="form-select" id="cins" required>
+                                <option value="">Seçiniz</option>
+                                <option value="Köpek">Köpek</option>
+                                <option value="Kedi">Kedi</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="yas" class="form-label">Yaş</label>
+                            <input type="number" class="form-control" id="yas" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="durum" class="form-label">Durum</label>
+                            <select class="form-select" id="durum" required>
+                                <option value="">Seçiniz</option>
+                                <option value="Sağlıklı">Sağlıklı</option>
+                                <option value="İyileşme">İyileşme</option>
+                                <option value="İhtiyaçlı">İhtiyaçlı</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="foto" class="form-label">Fotoğraf</label>
+                            <input type="file" class="form-control" id="foto" accept="image/*" required>
+                            <div class="mt-2">
+                                <img id="preview" src="" alt="Önizleme" style="max-width: 100%; max-height: 200px; display: none;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-code.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
     <script>
+        // Firebase yapılandırması
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvPV5Yjf4efTALtYOuGvXvslQFPPi2YtY",
+            authDomain: "cesal-gonulluleri.firebaseapp.com",
+            projectId: "cesal-gonulluleri",
+            storageBucket: "cesal-gonulluleri.firebasestorage.app",
+            messagingSenderId: "112825152740",
+            appId: "1:112825152740:web:a39b30575f7f4f70f6a8f1",
+            measurementId: "G-XEHKCCG04T"
+        };
+
+        // Firebase başlatma
+        const app = initializeApp(firebaseConfig);
+        const storage = app.storage();
+
         // Örnek veri
-        const canDostlari = [
-            {
-                foto: "https://via.placeholder.com/150",
-                ad: "Mavi",
-                cins: "Köpek",
-                yas: "3",
-                durum: "Sağlıklı"
-            },
-            {
-                foto: "https://via.placeholder.com/150",
-                ad: "Pamuk",
-                cins: "Kedi",
-                yas: "2",
-                durum: "İyileşme"
-            }
-        ];
+        const canDostlari = [];
 
         // Tabloya verileri ekleme
-        const tbody = document.getElementById('canDostlariListesi');
-        canDostlari.forEach(canDostu => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                <td>${canDostu.ad}</td>
-                <td>${canDostu.cins}</td>
-                <td>${canDostu.yas}</td>
-                <td>${canDostu.durum}</td>
-            `;
-            tbody.appendChild(row);
+        function canDostlariyiGoster() {
+            const tbody = document.getElementById('canDostlariListesi');
+            tbody.innerHTML = '';
+
+            canDostlari.forEach(canDostu => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                    <td>${canDostu.ad}</td>
+                    <td>${canDostu.cins}</td>
+                    <td>${canDostu.yas}</td>
+                    <td>${canDostu.durum}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="sil(${canDostu.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Can Dostu silme
+        function sil(id) {
+            canDostlari.splice(canDostlari.findIndex(canDostu => canDostu.id === id), 1);
+            canDostlariyiGoster();
+        }
+
+        // Sayfa yüklendiğinde örnek verileri göster
+        canDostlari.push({
+            id: 1,
+            ad: "Mavi",
+            cins: "Köpek",
+            yas: "3",
+            durum: "İyileşme",
+            foto: "https://via.placeholder.com/150"
         });
+
+        canDostlari.push({
+            id: 2,
+            ad: "Pamuk",
+            cins: "Kedi",
+            yas: "2",
+            durum: "Sağlıklı",
+            foto: "https://via.placeholder.com/150"
+        });
+
+        canDostlariyiGoster();
+
+        // Dosya seçildiğinde önizleme göster
+        document.getElementById('foto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Dosya yükleme fonksiyonu
+        async function yukleDosya(file) {
+            try {
+                const fileName = Date.now() + '_' + file.name;
+                const storageRef = storage.ref('can-dostlari/' + fileName);
+                const uploadTask = storageRef.put(file);
+
+                // Yükleme tamamlandıktan sonra URL'yi al
+                const snapshot = await uploadTask;
+                const url = await snapshot.ref.getDownloadURL();
+                return url;
+            } catch (error) {
+                console.error('Hata:', error);
+                throw error;
+            }
+        }
+
+        // Can Dostu ekleme
+        document.getElementById('canDostuEkleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('foto');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Lütfen bir fotoğraf seçin');
+                return;
+            }
+
+            try {
+                // Dosyayı yükle
+                const fotoUrl = await yukleDosya(file);
+
+                const canDostu = {
+                    id: Date.now(),
+                    ad: document.getElementById('ad').value,
+                    cins: document.getElementById('cins').value,
+                    yas: document.getElementById('yas').value,
+                    durum: document.getElementById('durum').value,
+                    foto: fotoUrl
+                };
+
+                canDostlari.push(canDostu);
+                canDostlariyiGoster();
+                document.getElementById('canDostuEkleForm').reset();
+                document.getElementById('preview').style.display = 'none';
+                const modal = bootstrap.Modal.getInstance(document.getElementById('canDostuEkleModal'));
+                modal.hide();
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        });
+    </script>
+
+            canDostlari.forEach(canDostu => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                    <td>${canDostu.ad}</td>
+                    <td>${canDostu.cins}</td>
+                    <td>${canDostu.yas}</td>
+                    <td>${canDostu.durum}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="sil(${canDostu.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Can Dostu ekleme
+        document.getElementById('canDostuEkleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const canDostu = {
+                id: Date.now(),
+                ad: document.getElementById('ad').value,
+                cins: document.getElementById('cins').value,
+                yas: document.getElementById('yas').value,
+                durum: document.getElementById('durum').value,
+                foto: document.getElementById('foto').value
+            };
+
+            canDostlari.push(canDostu);
+            canDostlariyiGoster();
+            document.getElementById('canDostuEkleForm').reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('canDostuEkleModal'));
+            modal.hide();
+        });
+
+        // Can Dostu silme
+        function sil(id) {
+            canDostlari.splice(canDostlari.findIndex(canDostu => canDostu.id === id), 1);
+            canDostlariyiGoster();
+        }
+
+        // Sayfa yüklendiğinde örnek verileri göster
+        canDostlari.push({
+            id: 1,
+            ad: "Mavi",
+            cins: "Köpek",
+            yas: "3",
+            durum: "İyileşme",
+            foto: "https://via.placeholder.com/150"
+        });
+
+        canDostlari.push({
+            id: 2,
+            ad: "Pamuk",
+            cins: "Kedi",
+            yas: "2",
+            durum: "Sağlıklı",
+            foto: "https://via.placeholder.com/150"
+        });
+
+        canDostlariyiGoster();
     </script>
 </body>
 </html>
