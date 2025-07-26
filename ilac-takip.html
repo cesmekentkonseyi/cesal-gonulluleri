@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlaç Takip - Cesal Gönüllüleri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Cesal Gönüllüleri</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gonullu-kayit.html">Gönüllü Kayıt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="can-dostlari.html">Can Dostları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="ilac-takip.html">İlaç Takip</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">İlaç Takip</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">İlaç Ekle</h5>
+                        <form id="ilacEkleForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="ilacAdi" class="form-label">İlaç Adı</label>
+                                    <input type="text" class="form-control" id="ilacAdi" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="doz" class="form-label">Doz</label>
+                                    <input type="number" class="form-control" id="doz" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="frekans" class="form-label">Frekans</label>
+                                    <select class="form-select" id="frekans" required>
+                                        <option value="1">1 Saat</option>
+                                        <option value="2">2 Saat</option>
+                                        <option value="3">3 Saat</option>
+                                        <option value="4">4 Saat</option>
+                                        <option value="6">6 Saat</option>
+                                        <option value="12">12 Saat</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="aciklama" class="form-label">Açıklama</label>
+                                <textarea class="form-control" id="aciklama" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">İlaç Ekle</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>İlaç Adı</th>
+                                <th>Doz</th>
+                                <th>Frekans</th>
+                                <th>Açıklama</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ilaclarListesi">
+                            <!-- JavaScript ile veriler buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('ilacEkleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ilacAdi = document.getElementById('ilacAdi').value;
+            const doz = document.getElementById('doz').value;
+            const frekans = document.getElementById('frekans').value;
+            const aciklama = document.getElementById('aciklama').value;
+            
+            // Yeni ilacı listeye ekle
+            const tbody = document.getElementById('ilaclarListesi');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${ilacAdi}</td>
+                <td>${doz}</td>
+                <td>${frekans} Saat</td>
+                <td>${aciklama}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="sil(this)">Sil</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            
+            // Formu temizle
+            document.getElementById('ilacEkleForm').reset();
+        });
+
+        function sil(button) {
+            button.closest('tr').remove();
+        }
+    </script>
+</body>
+</html>

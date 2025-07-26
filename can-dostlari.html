@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Dostları - Cesal Gönüllüleri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Cesal Gönüllüleri</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gonullu-kayit.html">Gönüllü Kayıt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="can-dostlari.html">Can Dostları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ilac-takip.html">İlaç Takip</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Can Dostları</h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fotoğraf</th>
+                                <th>Ad</th>
+                                <th>Cins</th>
+                                <th>Yaş</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="canDostlariListesi">
+                            <!-- JavaScript ile veriler buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Örnek veri
+        const canDostlari = [
+            {
+                foto: "https://via.placeholder.com/150",
+                ad: "Mavi",
+                cins: "Köpek",
+                yas: "3",
+                durum: "Sağlıklı"
+            },
+            {
+                foto: "https://via.placeholder.com/150",
+                ad: "Pamuk",
+                cins: "Kedi",
+                yas: "2",
+                durum: "İyileşme"
+            }
+        ];
+
+        // Tabloya verileri ekleme
+        const tbody = document.getElementById('canDostlariListesi');
+        canDostlari.forEach(canDostu => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                <td>${canDostu.ad}</td>
+                <td>${canDostu.cins}</td>
+                <td>${canDostu.yas}</td>
+                <td>${canDostu.durum}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
