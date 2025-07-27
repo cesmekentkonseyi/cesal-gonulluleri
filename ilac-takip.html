@@ -83,7 +83,7 @@
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody id="ilaclarListesi">
+                        <tbody>
                             <!-- JavaScript ile veriler buraya eklenecek -->
                         </tbody>
                     </table>
@@ -103,7 +103,7 @@
             const aciklama = document.getElementById('aciklama').value;
             
             // Yeni ilacı listeye ekle
-            const tbody = document.getElementById('ilaclarListesi');
+            const tbody = document.querySelector('tbody');
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${ilacAdi}</td>

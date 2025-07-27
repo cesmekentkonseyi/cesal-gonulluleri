@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- HTTPS Güvenliği -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self' https://cdn.jsdelivr.net https://kit.fontawesome.com https://www.gstatic.com; style-src 'self' https://cdn.jsdelivr.net;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <title>Admin Panel - Cesal Gönüllüleri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        .admin-container {
+            margin-top: 2rem;
+        }
+        .stat-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .stat-label {
+            color: #6c757d;
+        }
+        .table {
+            margin-top: 2rem;
+        }
+        .logout-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Cesal Gönüllüleri</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="barinak-takip.html">Barınak Takip</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="can-dostlari.html">Can Dostları</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-danger logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Çıkış
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <h2 class="mb-4">Admin Paneli</h2>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" id="gonulluSayisi">0</div>
+                    <div class="stat-label">Toplam Gönüllü</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <div class="stat-number" id="canDostSayisi">0</div>
+                    <div class="stat-label">Toplam Can Dostu</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-number" id="destekSayisi">0</div>
+                    <div class="stat-label">Toplam Destek</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-number" id="raporSayisi">0</div>
+                    <div class="stat-label">Toplam Rapor</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Gönüllüler</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ad</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gonullulerListesi">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-code.js"></script>
+    <script>
+        // Sayfa yüklendiğinde token kontrolü
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'giris.html';
+        }
+
+        // Sayfa yüklendiğinde istatistikleri yükle
+        async function yukleIstatistikler() {
+            try {
+                const response = await fetch('/api/admin/istatistikler', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('gonulluSayisi').textContent = data.gonulluSayisi;
+                    document.getElementById('canDostSayisi').textContent = data.canDostSayisi;
+                    document.getElementById('destekSayisi').textContent = data.destekSayisi;
+                    document.getElementById('raporSayisi').textContent = data.raporSayisi;
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+            }
+        }
+
+        // Gönüllü listesini yükle
+        async function yukleGonulluler() {
+            try {
+                const response = await fetch('/api/admin/gonulluler', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    const gonulluler = await response.json();
+                    const tbody = document.getElementById('gonullulerListesi');
+                    tbody.innerHTML = '';
+                    
+                    gonulluler.forEach(gonullu => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${gonullu.ad}</td>
+                            <td>${gonullu.email}</td>
+                            <td>${gonullu.rol}</td>
+                            <td>${gonullu.durum}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="duzenle(${gonullu.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="sil(${gonullu.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+            }
+        }
+
+        // Çıkış yap
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'giris.html';
+        }
+
+        // Sayfa yüklendiğinde gerekli verileri yükle
+        document.addEventListener('DOMContentLoaded', function() {
+            yukleIstatistikler();
+            yukleGonulluler();
+        });
+    </script>
+</body>
+</html>

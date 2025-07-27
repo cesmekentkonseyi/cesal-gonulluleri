@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- HTTPS Güvenliği -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self' https://cdn.jsdelivr.net https://kit.fontawesome.com https://www.gstatic.com; style-src 'self' https://cdn.jsdelivr.net;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <title>Can Dostları - Cesal Gönüllüleri</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -51,9 +56,9 @@
                             <tr>
                                 <th>Fotoğraf</th>
                                 <th>Ad</th>
-                                <th>Cins</th>
+                                <th>Cinsiyet</th>
                                 <th>Yaş</th>
-                                <th>Durum</th>
+                                <th>Mevcut Hastalık</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
@@ -80,25 +85,20 @@
                             <input type="text" class="form-control" id="ad" required>
                         </div>
                         <div class="mb-3">
-                            <label for="cins" class="form-label">Cins</label>
-                            <select class="form-select" id="cins" required>
+                            <label for="cinsiyet" class="form-label">Cinsiyet</label>
+                            <select class="form-select" id="cinsiyet" required>
                                 <option value="">Seçiniz</option>
-                                <option value="Köpek">Köpek</option>
-                                <option value="Kedi">Kedi</option>
+                                <option value="Erkek">Erkek</option>
+                                <option value="Dişi">Dişi</option>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mevcutHastalik" class="form-label">Mevcut Hastalık</label>
+                            <textarea class="form-control" id="mevcutHastalik" rows="3" placeholder="Can dostunun mevcut sağlık durumu ve hastalıkları"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="yas" class="form-label">Yaş</label>
                             <input type="number" class="form-control" id="yas" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="durum" class="form-label">Durum</label>
-                            <select class="form-select" id="durum" required>
-                                <option value="">Seçiniz</option>
-                                <option value="Sağlıklı">Sağlıklı</option>
-                                <option value="İyileşme">İyileşme</option>
-                                <option value="İhtiyaçlı">İhtiyaçlı</option>
-                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="foto" class="form-label">Fotoğraf</label>
@@ -147,9 +147,9 @@
                 row.innerHTML = `
                     <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
                     <td>${canDostu.ad}</td>
-                    <td>${canDostu.cins}</td>
+                    <td>${canDostu.cinsiyet}</td>
                     <td>${canDostu.yas}</td>
-                    <td>${canDostu.durum}</td>
+                    <td>${canDostu.mevcutHastalik}</td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="sil(${canDostu.id})">
                             <i class="fas fa-trash"></i>
@@ -170,18 +170,18 @@
         canDostlari.push({
             id: 1,
             ad: "Mavi",
-            cins: "Köpek",
+            cinsiyet: "Erkek",
             yas: "3",
-            durum: "İyileşme",
+            mevcutHastalik: "Sağlıklı",
             foto: "https://via.placeholder.com/150"
         });
 
         canDostlari.push({
             id: 2,
             ad: "Pamuk",
-            cins: "Kedi",
+            cinsiyet: "Dişi",
             yas: "2",
-            durum: "Sağlıklı",
+            mevcutHastalik: "İyileşme",
             foto: "https://via.placeholder.com/150"
         });
 
@@ -236,9 +236,9 @@
                 const canDostu = {
                     id: Date.now(),
                     ad: document.getElementById('ad').value,
-                    cins: document.getElementById('cins').value,
+                    cinsiyet: document.getElementById('cinsiyet').value,
                     yas: document.getElementById('yas').value,
-                    durum: document.getElementById('durum').value,
+                    mevcutHastalik: document.getElementById('mevcutHastalik').value,
                     foto: fotoUrl
                 };
 
@@ -253,42 +253,6 @@
             }
         });
     </script>
-
-            canDostlari.forEach(canDostu => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><img src="${canDostu.foto}" alt="${canDostu.ad}" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                    <td>${canDostu.ad}</td>
-                    <td>${canDostu.cins}</td>
-                    <td>${canDostu.yas}</td>
-                    <td>${canDostu.durum}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="sil(${canDostu.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Can Dostu ekleme
-        document.getElementById('canDostuEkleForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const canDostu = {
-                id: Date.now(),
-                ad: document.getElementById('ad').value,
-                cins: document.getElementById('cins').value,
-                yas: document.getElementById('yas').value,
-                durum: document.getElementById('durum').value,
-                foto: document.getElementById('foto').value
-            };
-
-            canDostlari.push(canDostu);
-            canDostlariyiGoster();
-            document.getElementById('canDostuEkleForm').reset();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('canDostuEkleModal'));
             modal.hide();
         });
 
